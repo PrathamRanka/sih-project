@@ -1,9 +1,19 @@
+import fs from "fs";
+import path from "path";
+import { fileURLToPath } from "url";
 import axios from "axios";
 
-let results = []; // In-memory store (use DB later if needed)
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+let results = []; // in-memory store
+
+// Load static ML model JSON
+const mlDataPath = path.join(process.cwd(), "mlModel.json");
+const mlData = JSON.parse(fs.readFileSync(mlDataPath, "utf-8"));
 
 /**
- * Process result by fetching from ML API + Gemini API
+ * Process result using static ML JSON + Gemini API
  */
 export const processResult = async (req, res, next) => {
   try {
@@ -13,26 +23,26 @@ export const processResult = async (req, res, next) => {
       return res.status(400).json({ message: "❌ Image URL required" });
     }
 
-    // --- Step 1: Call local ML model API ---
-    const mlResponse = await axios.post(process.env.ML_MODEL_API, { imageUrl });
-    const localDetections = mlResponse.data?.detections || [];
+    // --- Step 1: Use static ML detections ---
+    const localDetections = mlData.detections || [];
 
     // --- Step 2: Call Gemini API ---
     const geminiResponse = await axios.post(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${process.env.GEMINI_API_KEY}`,
+       `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${process.env.GEMINI_API_KEY}`,
       {
         contents: [
           {
             role: "user",
             parts: [
-              { text: `Identify marine species and counts in this image: ${imageUrl}. Respond strictly in JSON array format like: [{"species":"plankton","count":12}]` }
+              {
+                text: `Identify marine species and counts in this image: ${imageUrl}. Respond strictly in JSON array format like: [{"species":"plankton","count":12}]`
+              }
             ]
           }
         ]
       }
     );
 
-    // Gemini may return text → parse into JSON safely
     let geminiDetections = [];
     try {
       const raw = geminiResponse.data?.candidates?.[0]?.content?.parts?.[0]?.text;
@@ -41,14 +51,20 @@ export const processResult = async (req, res, next) => {
       console.warn("⚠️ Could not parse Gemini response, using [] instead");
       geminiDetections = [];
     }
+    // --- Step 2: TEMP disable Gemini call (use dummy detections) ---
+// const geminiDetections = [
+//   { species: "fish", count: 3 },
+//   { species: "plankton", count: 12 }
+// ];
 
-    // --- Step 3: Compare both results ---
+
+    // --- Step 3: Compare results ---
     const isMatch =
       JSON.stringify(localDetections.sort()) === JSON.stringify(geminiDetections.sort());
 
     const finalDetections = isMatch ? localDetections : geminiDetections;
 
-    // --- Step 4: Save in-memory (later replace with DB) ---
+    // --- Step 4: Save result in-memory ---
     const newResult = {
       id: results.length + 1,
       imageUrl,
@@ -71,7 +87,7 @@ export const processResult = async (req, res, next) => {
 };
 
 /**
- * Get all processed results
+ * Get all results
  */
 export const getResults = (req, res) => {
   res.json(results);
