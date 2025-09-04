@@ -9,7 +9,8 @@ const __dirname = path.dirname(__filename);
 let results = []; // in-memory store
 
 // Load static ML model JSON
-const mlDataPath = path.join(process.cwd(), "mlModel.json");
+// const mlDataPath = path.join(process.cwd(), "mlModel.json");
+const mlDataPath = path.join(__dirname, "mlModel.json");
 const mlData = JSON.parse(fs.readFileSync(mlDataPath, "utf-8"));
 
 /**
@@ -43,14 +44,30 @@ export const processResult = async (req, res, next) => {
       }
     );
 
-    let geminiDetections = [];
-    try {
-      const raw = geminiResponse.data?.candidates?.[0]?.content?.parts?.[0]?.text;
-      geminiDetections = JSON.parse(raw);
-    } catch (err) {
-      console.warn("⚠️ Could not parse Gemini response, using [] instead");
-      geminiDetections = [];
-    }
+   let geminiDetections = [];
+try {
+  const raw = geminiResponse.data?.candidates?.[0]?.content?.parts?.[0]?.text;
+
+  // Use a regex to find and extract the content of the JSON code block
+  const jsonMatch = raw.match(/```json\s*([\s\S]*?)\s*```/);
+  let jsonString = raw;
+
+  // If a JSON code block is found, use its content
+  if (jsonMatch && jsonMatch[1]) {
+    jsonString = jsonMatch[1];
+  } else {
+    // If no markdown block is found, trim whitespace and extra text
+    // as a fallback. This handles cases where the model directly outputs JSON.
+    jsonString = jsonString.trim();
+  }
+
+  geminiDetections = JSON.parse(jsonString);
+} catch (err) {
+  console.warn("⚠️ Could not parse Gemini response, using [] instead");
+  // It's helpful to log the raw response data here to see what caused the error.
+  console.error("Raw response that failed parsing:", geminiResponse.data);
+  geminiDetections = [];
+}
     // --- Step 2: TEMP disable Gemini call (use dummy detections) ---
 // const geminiDetections = [
 //   { species: "fish", count: 3 },
