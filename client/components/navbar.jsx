@@ -12,7 +12,7 @@ export default function Navbar() {
         <div className="flex justify-between h-16 items-center">
           {/* Logo */}
           <Link to="/" className="text-2xl font-bold text-blue-600">
-            OrgName
+            AquaNexus
           </Link>
 
           {/* Desktop Links */}
