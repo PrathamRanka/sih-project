@@ -38,7 +38,7 @@ const team = [
   { name: "Kumar Abhinandan", role: "ML & AI", domain: "Computer Vision & Deep Learning", icon: Brain },
   { name: "Avneet Bhatia", role: "Frontend", domain: "React & UI Development", icon: Monitor },
   { name: "Rushil Kapoor", role: "IoT", domain: "Embedded Systems & Sensors", icon: Cpu },
-  { name: "Srsihti", role: "Designer", domain: "UI/UX & Visual Design", icon: Palette },
+  { name: "Srishti Juneja", role: "Designer", domain: "UI/UX & Visual Design", icon: Palette },
 ]
 
 export default function TrustPage() {
