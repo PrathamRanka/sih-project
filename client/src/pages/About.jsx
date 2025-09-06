@@ -1,8 +1,17 @@
+import React from 'react'
+import TrustPage from './../../components/TrustPage';
+import ProblemPage from './../../components/ProblemPage';
+import HowPage from './../../components/HowPage';
+import InnovationPage from './../../components/InnovationPage';
+import Navbar from '../../components/navbar';
 export default function About() {
   return (
-    <div className="p-6 width-[500px]">
-      <h1 className="text-3xl font-bold">Embedded Intelligent Microscopy System for Identification and Counting of Microscopic Marine Organisms</h1>
-     
-    </div>
+    <>
+    <Navbar />
+      <ProblemPage />
+      <HowPage />
+      <InnovationPage />
+      <TrustPage />
+    </>
   )
 }

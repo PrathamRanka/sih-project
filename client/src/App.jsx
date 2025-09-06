@@ -9,7 +9,7 @@ function App() {
   return (
     
     <>
-    <Navbar/>
+    {/* <Navbar/> */}
     <Routes>
         <Route path="/about" element={<About />} />
         <Route path="/capture" element={<CapturePage />} />
