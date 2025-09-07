@@ -15,6 +15,8 @@ COPY requirements.txt .
 RUN python -m venv /opt/venv
 RUN /opt/venv/bin/pip install --upgrade pip
 RUN /opt/venv/bin/pip install -r requirements.txt
+# Make sure executables in venv are found
+ENV PATH="/opt/venv/bin:$PATH"
 
 # Copy your application code
 COPY . .
