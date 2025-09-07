@@ -5,6 +5,10 @@ import axios from "axios";
 import { motion } from "framer-motion";
 import Navbar from "../../components/navbar";
 
+const BACKEND_URL = process.env.NODE_ENV === "development"
+  ? "http://localhost:8000"
+  : "https://aquanexus-production.up.railway.app";
+
 const CapturePage = () => {
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
@@ -69,14 +73,14 @@ const CapturePage = () => {
     setResult(null);
     try {
       const formData = new FormData();
-      formData.append("file", file); // ✅ changed to match FastAPI
+      formData.append("file", file);
 
-      const response = await axios.post("http://localhost:8000/predict", formData, {
+      const response = await axios.post(`${BACKEND_URL}/predict`, formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
-      console.log("Data from backend:", response.data);
 
-      setResult(response.data); // ✅ backend gives { labels, count, annotated_image }
+      console.log("Data from backend:", response.data);
+      setResult(response.data);
     } catch (err) {
       setError("Failed to analyze image. Please try again.");
       console.error("Backend error:", err.response ? err.response.data : err.message);
@@ -229,7 +233,7 @@ const CapturePage = () => {
             {/* Annotated Image */}
             {result.annotated_image && (
               <img
-                src={`http://localhost:8000/${result.annotated_image}`}
+                src={`${BACKEND_URL}/${result.annotated_image}`}
                 alt="Annotated"
                 className="mt-4 rounded-xl shadow-lg max-h-[400px]"
               />
