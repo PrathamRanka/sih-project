@@ -37,7 +37,7 @@ export const processResult = async (req, res, next) => {
     // --- Step 2: Call Gemini API with the Base64 data ---
     // This is the robust solution that avoids public URL hosting.
     const geminiResponse = await axios.post(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${process.env.GEMINI_API_KEY}`,
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-pro:generateContent?key=${process.env.GEMINI_API_KEY}`,
       {
         contents: [
           {
