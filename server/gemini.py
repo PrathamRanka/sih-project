@@ -4,9 +4,37 @@ import re
 import cv2
 import json
 import PIL.Image
+import requests   # <-- NEW
 import google.generativeai as genai
 from ultralytics import YOLO
 from dotenv import load_dotenv
+
+# ----------------- IPFS Upload Helpers -----------------
+
+def upload_json_to_ipfs(data: dict):
+    """Upload JSON metadata to IPFS (Pinata)."""
+    jwt = os.getenv("PINATA_JWT")
+    if not jwt:
+        raise ValueError("PINATA_JWT not found in environment.")
+    
+    url = "https://api.pinata.cloud/pinning/pinJSONToIPFS"
+    headers = {"Authorization": f"Bearer {jwt}"}
+    response = requests.post(url, json=data, headers=headers)
+    response.raise_for_status()
+    return response.json()
+
+def upload_file_to_ipfs(filepath: str) -> str:
+    """Upload a file (image, pdf, etc.) to IPFS (Pinata)."""
+    jwt = os.getenv("PINATA_JWT")
+    if not jwt:
+        raise ValueError("PINATA_JWT not found in environment.")
+    
+    url = "https://api.pinata.cloud/pinning/pinFileToIPFS"
+    headers = {"Authorization": f"Bearer {jwt}"}
+    with open(filepath, "rb") as f:
+        response = requests.post(url, files={"file": (os.path.basename(filepath), f)}, headers=headers)
+    response.raise_for_status()
+    return response.json()
 
 # ----------------- Helper Functions -----------------
 
@@ -173,15 +201,38 @@ def process_image(image_path, yolo_model, output_folder="outputs"):
     draw_annotations_on_image(image_path, final_annotations, final_image_path)
     print(f"-> Final annotated image saved to: {final_image_path}")
 
+    # Upload to IPFS
+    ipfs_url = upload_file_to_ipfs(final_image_path)   # <--- call helper we wrote earlier
+    print(f"-> File uploaded to IPFS: {ipfs_url}")
+
     # 4. Compile and return the final results
     result = {
         "source_image": image_path,
         "verification_status": status,  # "OK" or "CORRECTED"
         "detected_objects": [ann[4] for ann in final_annotations],
         "final_count": len(final_annotations),
-        "annotated_image_path": final_image_path
+        "annotated_image_path": final_image_path,
+        "ipfs_url": ipfs_url  # <--- now included in JSON
     }
     print(f"===== PROCESSING COMPLETE. Status: {status}, Final Count: {result['final_count']} =====")
+    # 5. Upload to IPFS
+    print("\n--- Step 4: Uploading results to IPFS ---")
+    try:
+        ipfs_json = upload_json_to_ipfs(result)
+        ipfs_image = upload_file_to_ipfs(final_image_path)
+
+        result["ipfs_json_cid"] = ipfs_json.get("IpfsHash")
+        result["ipfs_image_cid"] = ipfs_image.get("IpfsHash")
+
+        # Optional: return gateway URLs
+        result["ipfs_json_url"] = f"https://gateway.pinata.cloud/ipfs/{result['ipfs_json_cid']}"
+        result["ipfs_image_url"] = f"https://gateway.pinata.cloud/ipfs/{result['ipfs_image_cid']}"
+
+        print(f"-> Uploaded JSON CID: {result['ipfs_json_cid']}")
+        print(f"-> Uploaded Image CID: {result['ipfs_image_cid']}")
+    except Exception as e:
+        print(f"⚠️ Failed to upload to IPFS: {e}")
+
     return result
 
 # ----------------- Example Usage -----------------

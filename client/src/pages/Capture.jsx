@@ -230,6 +230,22 @@ const CapturePage = () => {
             {/* Count */}
             <p className="text-indigo-300 font-medium">Total Count: {result.count}</p>
 
+             {/* IPFS Link */}
+{result.ipfs_url && (
+  <p className="text-green-300 font-medium">
+    🔗 Stored on IPFS:{" "}
+    <a 
+      href={result.ipfs_url} 
+      target="_blank" 
+      rel="noopener noreferrer"
+      className="underline text-red-700 hover:text-blue-500"
+    >
+      {result.ipfs_url}
+    </a>
+  </p>
+)}
+
+
             {/* Annotated Image */}
             {result.annotated_image && (
               <img
