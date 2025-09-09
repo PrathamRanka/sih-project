@@ -9,7 +9,7 @@ Official Site is live on
 
 ---
 
-## ✨ About the Project  
+##  About the Project  
 Microbes play a crucial role in ecosystems, human health, and biotechnology.  
 AQUANEXUS makes it easier to identify, analyze, and learn about different microbes using modern technologies.  
 
@@ -21,7 +21,7 @@ Our system uses:
 
 ---
 
-## 🚀 Core Functionalities  
+##  Core Functionalities  
 - 🧬 Microbe detection and classification  
 - ⚡ Parallel image processing with AI/ML  
 - 🔗 Web3-powered secure storage  
@@ -30,7 +30,7 @@ Our system uses:
 
 ---
 
-## 🛠 Tech Stack  
+##  Tech Stack  
 
 **Frontend**  
 - React + Vite  
@@ -48,11 +48,11 @@ Our system uses:
 
 **Other Tools**  
 - Web3 Integration  
-- Docker (optional for deployment)  
+- Docker (Deployment)  
 
 ---
 
-## 📂 Folder Structure  
+##  Folder Structure  
 
 ```
 sih-project/
@@ -78,7 +78,7 @@ sih-project/
 
 ---
 
-## 🛠️ Installation Guide
+##  Installation Guide
 
 ### 1. Clone the Repository
 
@@ -97,28 +97,28 @@ npm install
 ### 3. Setup Backend
 
 ```bash
-cd ../server
+cd server
 pip install -r requirements.txt
 ```
 
 ---
 
-## ⚙️ Environment Variable Setup
+##  Environment Variable Setup
 
 
 1 Set the following variables in `.env`:
 
    ```
-   # Web3 settings
-   WEB3_PROVIDER_URL=your_web3_provider_url
+   # IPFS - FILE TRANSFER API KEY ( to be used in GEMINI.PY)
+   PINATA_JWT=your_web3_provider_url
 
-   # Gemini API key
+   # Gemini API key ( TO BE USED IN GEMINI.py we are using 1.5-flash use , 2.5-pro for best results or any better api key)
    GEMINI_API_KEY=your_gemini_api_key
    ```
 
 ---
 
-## 🚦 Usage Instructions
+##  Usage Instructions
 
 ### 1. Start the Backend Server
 
@@ -142,7 +142,7 @@ Visit [http://localhost:5173](http://localhost:5173) in your browser.
 
 ---
 
-## 🤝 Contribution Guidelines
+##  Contribution Guidelines
 
 1. Fork the repository.
 2. Create a new branch (`git checkout -b feature/your-feature`).
@@ -154,13 +154,13 @@ Please follow the [Contributor Covenant](https://www.contributor-covenant.org/) 
 
 ---
 
-## 📄 License
+##  License
 
 This project is licensed under the [MIT License](LICENSE).
 
 ---
 
-## 🙌 Credits
+##  Credits
 
 **Team Limitless**  
 - Pratham Ranka – Web3 Lead
